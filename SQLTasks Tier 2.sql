@@ -110,19 +110,20 @@ AND (
 ORDER BY cost DESC;
 
 /* Q9: This time, produce the same result as in Q8, but using a subquery. */
-SELECT surname, firstname,name, cost
+SELECT CONCAT(surname, ', ', firstname, ' ', name), cost
 FROM (
     SELECT bookid, firstname, surname, name,
 	CASE 
-		WHEN memid = 0 THEN guestcost
-		ELSE membercost END AS cost
-	FROM Bookings
-	LEFT JOIN Members
+		WHEN memid = 0 THEN guestcost * b.slots
+		ELSE membercost * b.slots END AS cost
+	FROM Bookings AS b
+	LEFT JOIN Members AS m
 	USING (memid)
-	LEFT JOIN Facilities
+	LEFT JOIN Facilities AS f
 	USING (facid)
 	WHERE CAST(starttime AS DATE) = '2012-09-14') AS table_price
-WHERE cost > 30;
+WHERE cost > 30
+ORDER BY cost DESC;
 
 /* PART 2: SQLite
 
